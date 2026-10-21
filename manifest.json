@@ -1,0 +1,47 @@
+{
+  "manifest_version": 2,
+  "name": "Self-Hosted Sidebar",
+  "version": "1.0.1",
+  "description": "Pin your self-hosted apps, Docker services and local dev servers in the sidebar as named tabs. No data collection.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{b77e58d4-21da-4db6-8d3d-240fedf44608}",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": { "required": ["none"] }
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png"
+  },
+  "sidebar_action": {
+    "default_title": "Self-Hosted Sidebar",
+    "default_panel": "sidebar.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    },
+    "open_at_install": true
+  },
+  "commands": {
+    "_execute_sidebar_action": {
+      "suggested_key": { "default": "Alt+Shift+T" },
+      "description": "Toggle the Self-Hosted Sidebar"
+    }
+  },
+  "background": { "scripts": ["background.js"] },
+  "permissions": [
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "http://localhost/*",
+    "http://127.0.0.1/*"
+  ],
+  "optional_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ]
+}
