@@ -55,7 +55,7 @@ There is no build step.
 ```
 npx web-ext lint
 npx web-ext run
-npx web-ext build
+npx web-ext build   # zip the files into web-ext-artifacts/ for upload not a build
 ```
 
 ## License
