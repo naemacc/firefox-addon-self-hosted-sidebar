@@ -50,12 +50,12 @@ The extension collects no data and sends nothing to the developer or any third p
 
 ## Development
 
-There is no build step.
+There is no build step. Only zipping.
 
 ```
 npx web-ext lint
 npx web-ext run
-npx web-ext build   # zip the files into web-ext-artifacts/ for upload not a build
+npx web-ext build
 ```
 
 ## License
