@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Self-Hosted Sidebar",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Pin your self-hosted apps, Docker services and local dev servers in the sidebar as named tabs. No data collection.",
   "browser_specific_settings": {
     "gecko": {
