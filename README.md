@@ -105,7 +105,7 @@ There is no build step.
    npx web-ext build
    ```
 
-Issues and pull requests are welcome.
+Issues and pull requests are welcome. Please ensure you fork the repository and submit all Pull Requests to the `dev` branch, as this project follows a `dev` -> `main` workflow.
 
 ## License
 
