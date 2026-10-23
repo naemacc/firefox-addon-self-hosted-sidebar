@@ -22,7 +22,7 @@ jobs:
         run: npx --yes web-ext lint
 
       - name: Build extension zip
-        run: npx --yes web-ext build --overwrite-dest --ignore-files "preview-pictures/**" "AMO-listing.md" ".github/**"
+        run: npx --yes web-ext build
 
       - name: Upload zip
         uses: actions/upload-artifact@v6
