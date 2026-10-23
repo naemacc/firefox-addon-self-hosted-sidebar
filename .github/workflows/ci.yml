@@ -10,9 +10,9 @@ jobs:
   lint-and-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
 
@@ -23,7 +23,7 @@ jobs:
         run: npx --yes web-ext build --overwrite-dest --ignore-files "preview-pictures/**" "AMO-listing.md" ".github/**"
 
       - name: Upload zip
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: extension-zip
           path: web-ext-artifacts/*.zip
