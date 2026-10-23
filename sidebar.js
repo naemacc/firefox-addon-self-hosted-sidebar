@@ -21,6 +21,7 @@ const MODE_TITLE = {
   icon: "Icon only",
   name: "Name only",
 };
+let dragIndex = null; // index of the tab being dragged, or null
 const iconCache = new Map(); // page url -> icon url
 let settling = true; // true for the first moments after the sidebar opens
 setTimeout(() => (settling = false), 2000);
@@ -121,6 +122,37 @@ async function render() {
         "\n" +
         t.url +
         "\nDouble-click or right-click to edit";
+      el.draggable = true;
+      el.ondragstart = (e) => {
+        dragIndex = i;
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/plain", String(i));
+        el.classList.add("dragging");
+      };
+      el.ondragend = () => {
+        dragIndex = null;
+        el.classList.remove("dragging");
+        clearDropMarks();
+      };
+      el.ondragover = (e) => {
+        if (dragIndex === null) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        const r = el.getBoundingClientRect();
+        const after = e.clientX > r.left + r.width / 2;
+        clearDropMarks();
+        el.classList.add(after ? "drop-after" : "drop-before");
+      };
+      el.ondrop = async (e) => {
+        e.preventDefault();
+        if (dragIndex === null) return;
+        const r = el.getBoundingClientRect();
+        const after = e.clientX > r.left + r.width / 2;
+        const from = dragIndex;
+        dragIndex = null;
+        clearDropMarks();
+        await moveTab(from, i + (after ? 1 : 0));
+      };
       el.onclick = () => select(i);
       el.ondblclick = () => openPanel(i);
       el.oncontextmenu = (e) => {
@@ -145,6 +177,7 @@ async function render() {
 
       if (display !== "name") {
         const img = document.createElement("img");
+        img.draggable = false;
         img.hidden = true;
         img.onload = () => {
           img.hidden = false;
@@ -186,6 +219,35 @@ async function select(i) {
   await browser.storage.local.set({ last: i });
   render();
 }
+
+function clearDropMarks() {
+  for (const el of tabsEl.querySelectorAll(".drop-before, .drop-after"))
+    el.classList.remove("drop-before", "drop-after");
+}
+
+// Move the tab at `from` so it ends up before position `to` (in the old list).
+async function moveTab(from, to) {
+  const { tabs, last } = await getState();
+  const activeId = tabs[last]?.id;
+  if (from < to) to--;
+  if (from === to || !tabs[from]) return;
+  const [item] = tabs.splice(from, 1);
+  tabs.splice(to, 0, item);
+  const newLast = Math.max(0, tabs.findIndex((t) => t.id === activeId));
+  await browser.storage.local.set({ tabs, last: newLast });
+  render();
+}
+
+// scroll the tab row when dragging near its left/right edge
+tabsEl.addEventListener("dragover", (e) => {
+  if (dragIndex === null) return;
+  const r = tabsEl.getBoundingClientRect();
+  if (e.clientX < r.left + 30) tabsEl.scrollLeft -= 12;
+  else if (e.clientX > r.right - 30) tabsEl.scrollLeft += 12;
+});
+tabsEl.addEventListener("dragleave", (e) => {
+  if (!tabsEl.contains(e.relatedTarget)) clearDropMarks();
+});
 
 async function remove(i) {
   const { tabs, last } = await getState();
