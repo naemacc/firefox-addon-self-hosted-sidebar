@@ -1,4 +1,5 @@
 module.exports = {
+  // Files and folders that must not end up in the zip
   ignoreFiles: [
     "preview-pictures",
     "AMO-listing.md",
