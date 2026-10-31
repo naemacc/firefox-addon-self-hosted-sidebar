@@ -17,7 +17,8 @@ let queue = Promise.resolve();
 function allowEmbedding(details) {
   // Leave frames alone unless the top of the frame tree is our own sidebar page.
   const chain = details.frameAncestors;
-  const top = chain && chain.length ? chain[chain.length - 1].url : details.documentUrl;
+  const top =
+    chain && chain.length ? chain[chain.length - 1].url : details.documentUrl;
   if (!top || !top.startsWith(EXT_BASE)) return {};
 
   const headers = [];
@@ -57,7 +58,7 @@ async function register() {
   browser.webRequest.onHeadersReceived.addListener(
     current,
     { urls, types: ["sub_frame"] },
-    ["blocking", "responseHeaders"]
+    ["blocking", "responseHeaders"],
   );
 
   try {
@@ -89,7 +90,7 @@ async function migrateSettings() {
   const patch = {};
   if (s.bar !== undefined) {
     patch.compact = s.bar === "compact";
-    patch.autohide = s.bar === "hidden";
+    patch.autohide = s.bar === "hidden" ? "tabs" : "none";
   }
   if (s.hover === "none") {
     patch.hover = "overlay";

@@ -20,7 +20,9 @@
         --btn: 34px;
         --icon: 18px;
         color-scheme: dark;
-        font: 13px/1.3 system-ui, sans-serif;
+        font:
+          13px/1.3 system-ui,
+          sans-serif;
       }
       * {
         box-sizing: border-box;
@@ -41,9 +43,16 @@
       }
 
       /* ---------- layout: [rail slot][page] (mirrored when placement=right) ---------- */
+      #shell {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+      }
       #app {
         display: flex;
-        height: 100%;
+        flex: 1;
+        min-height: 0;
         position: relative;
       }
       #app[data-layout="vertical"][data-placement="right"] {
@@ -57,7 +66,10 @@
         z-index: 20;
         flex: 0 0 var(--slot-size, 150px);
         width: var(--slot-size, 150px);
-        transition: flex-basis 0.1s ease, width 0.1s ease, height 0.1s ease;
+        transition:
+          flex-basis 0.1s ease,
+          width 0.1s ease,
+          height 0.1s ease;
       }
       #app[data-layout="horizontal"] #slot {
         width: auto;
@@ -74,7 +86,11 @@
         padding: 6px;
         overflow: hidden;
         background: var(--bg);
-        transition: width 0.1s ease, height 0.1s ease;
+        clip-path: inset(-24px);
+        transition:
+          width 0.1s ease,
+          height 0.1s ease,
+          clip-path 0.1s ease;
       }
       #app[data-layout="vertical"][data-placement="left"] #rail {
         left: 0;
@@ -84,8 +100,16 @@
       }
       /* auto-hide: the bar collapses to nothing and the slot keeps a thin hover edge */
       #rail.hiddenbar {
-        padding: 0;
         pointer-events: none;
+      }
+      #app[data-layout="vertical"][data-placement="left"] #rail.hiddenbar {
+        clip-path: inset(-24px 100% -24px -24px);
+      }
+      #app[data-layout="vertical"][data-placement="right"] #rail.hiddenbar {
+        clip-path: inset(-24px -24px -24px 100%);
+      }
+      #app[data-layout="horizontal"] #rail.hiddenbar {
+        clip-path: inset(-24px -24px 100% -24px);
       }
       #slot.floating #rail {
         box-shadow: 0 0 18px rgba(0, 0, 0, 0.55);
@@ -307,8 +331,16 @@
       }
       /* the label fades out beneath the X instead of being squeezed by it */
       .tab.regular:hover .label {
-        -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent calc(100% - 20px));
-        mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent calc(100% - 20px));
+        -webkit-mask-image: linear-gradient(
+          to right,
+          #000 calc(100% - 34px),
+          transparent calc(100% - 20px)
+        );
+        mask-image: linear-gradient(
+          to right,
+          #000 calc(100% - 34px),
+          transparent calc(100% - 20px)
+        );
       }
       /* icon-only and compact tabs: round close badge at the icon's corner (Zen style) */
       #rail.collapsed .tab.regular:hover .x,
@@ -342,8 +374,15 @@
         background: var(--active);
       }
       .tab.essential.active {
-        background: var(--active);
-        box-shadow: inset 0 0 0 1.5px var(--accent);
+        background: color-mix(
+          in srgb,
+          var(--tab-color, var(--accent)) 24%,
+          var(--surface)
+        );
+        box-shadow: inset 0 0 0 1.5px var(--tab-color, var(--accent));
+      }
+      #rail.collapsed .tab.essential {
+        height: var(--tab-h);
       }
       .tab.essential .label {
         display: none;
@@ -364,7 +403,10 @@
       #app[data-display="name"] .ltr {
         display: grid !important;
       }
-      #app[data-display="name"] #rail:not(.collapsed) .tab:not(.essential) .icon {
+      #app[data-display="name"]
+        #rail:not(.collapsed)
+        .tab:not(.essential)
+        .icon {
         display: none;
       }
 
@@ -448,9 +490,6 @@
         align-items: center;
         padding: 4px 6px;
       }
-      #app[data-layout="horizontal"] #rail.hiddenbar {
-        padding: 0;
-      }
       #app[data-layout="horizontal"] #essentials {
         display: flex;
         gap: 2px;
@@ -489,7 +528,10 @@
       #app[data-layout="horizontal"] .tab.pinned .label {
         display: none;
       }
-      #app[data-display="name"][data-layout="horizontal"] #rail .tab.pinned .icon {
+      #app[data-display="name"][data-layout="horizontal"]
+        #rail
+        .tab.pinned
+        .icon {
         display: grid !important;
       }
       #app[data-layout="horizontal"] .tab.drop-before,
@@ -550,9 +592,8 @@
       /* a short, clear divider between Essentials, Pinned and regular tabs when the bar is compact */
       #rail.collapsed .sep {
         width: calc(var(--icon) + 6px);
-        height: 2px;
+        height: 1px;
         margin: 6px auto;
-        border-radius: 1px;
         background: #4b4a55;
       }
 
@@ -567,6 +608,207 @@
       }
       #app[data-essbox="off"] .tab.essential.active {
         background: transparent;
+      }
+
+      /* ---------- address bar ---------- */
+      #urlslot {
+        position: relative;
+        z-index: 25;
+        flex: 0 0 var(--url-slot, 0px);
+        height: var(--url-slot, 0px);
+        transition:
+          flex-basis 0.1s ease,
+          height 0.1s ease;
+      }
+      #urlbar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: var(--url-top, 0px);
+        height: var(--url-size, 0px);
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 0 6px;
+        overflow: hidden;
+        background: var(--bg);
+        font-size: var(--fs, 13px);
+        transition: height 0.1s ease;
+      }
+      #urlbar.hiddenbar {
+        pointer-events: none;
+      }
+      #urlslot.floating #urlbar {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      }
+      #navgrp,
+      #rgrp {
+        display: flex;
+        align-items: center;
+        flex: none;
+        transition: min-width 0.1s ease;
+      }
+      #navgrp .btn,
+      #rgrp .btn {
+        width: calc(var(--btn) - 4px);
+        height: var(--btn);
+      }
+      /* only Reload showing: it sits on the same axis as the tab icons below it */
+      #urlbar.single #reload {
+        width: var(--tile-w);
+      }
+      /* vertical tabs: the group beside the tab bar is as wide as the tab bar, so the address
+         field starts at the page edge and a lone button sits above the tab icons */
+      #shell[data-layout="vertical"][data-placement="left"] #navgrp {
+        min-width: calc(var(--slot-size) - 2px);
+      }
+      #shell[data-layout="vertical"][data-placement="right"] #rgrp {
+        min-width: calc(var(--slot-size) - 2px);
+        justify-content: flex-end;
+      }
+      #shell[data-layout="vertical"][data-placement="right"] #rgrp .btn {
+        width: var(--tile-w);
+      }
+      #shell[data-placement="left"] #field {
+        margin-right: 2px;
+      }
+      #shell[data-placement="right"] #field {
+        margin-left: 2px;
+      }
+      #shell[data-layout="horizontal"] #field {
+        margin: 0 2px;
+      }
+      #hotUrl {
+        position: absolute;
+        z-index: 26;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 12px;
+      }
+      #field {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        height: var(--btn);
+        border-radius: 10px;
+        background: var(--surface);
+      }
+      #field:focus-within {
+        box-shadow: 0 0 0 2px var(--accent);
+      }
+      #addr {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        padding: 0 4px;
+        border: 0;
+        outline: none;
+        background: transparent;
+        color: var(--text);
+        font: inherit;
+        text-overflow: ellipsis;
+      }
+      #addr::placeholder {
+        color: var(--muted);
+      }
+      .fbtn {
+        appearance: none;
+        flex: none;
+        display: grid;
+        place-items: center;
+        width: var(--btn);
+        height: 100%;
+        padding: 0;
+        border: 0;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .fbtn:hover {
+        background: var(--hover);
+        color: var(--text);
+      }
+      .fbtn:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .fbtn svg {
+        width: calc(var(--icon) - 2px);
+        height: calc(var(--icon) - 2px);
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      #copy .ok-icon {
+        display: none;
+        color: #6fd08c;
+      }
+      #copy.ok .link-icon {
+        display: none;
+      }
+      #copy.ok .ok-icon {
+        display: block;
+      }
+
+      /* history dropdown */
+      #hmenu {
+        position: fixed;
+        z-index: 60;
+        padding: 4px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+        max-height: min(60vh, 360px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        font-size: 12px;
+      }
+      #hmenu .hitem {
+        appearance: none;
+        display: block;
+        width: 100%;
+        padding: 6px 10px;
+        border: 0;
+        border-radius: 6px;
+        background: none;
+        color: var(--text);
+        text-align: left;
+        font: inherit;
+        cursor: pointer;
+      }
+      #hmenu .hitem:hover,
+      #hmenu .hitem:focus-visible {
+        background: var(--active);
+        outline: none;
+      }
+      #hmenu .hitem.cur .t {
+        color: var(--accent);
+      }
+      #hmenu .t,
+      #hmenu .u {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #hmenu .u {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      #hmenu .empty {
+        padding: 8px 10px;
+        color: var(--muted);
+      }
+      #hmenu hr {
+        margin: 4px 2px;
+        border: 0;
+        border-top: 1px solid var(--line);
       }
 
       /* ---------- add / edit popover ---------- */
@@ -711,71 +953,144 @@
     </style>
   </head>
   <body>
-    <div id="app">
-      <aside id="slot">
-        <nav id="rail" aria-label="Tabs">
-          <div id="essentials" role="group" aria-label="Essentials" hidden></div>
-          <div class="sep" id="sepA" hidden></div>
-          <div id="pinned" role="group" aria-label="Pinned" hidden></div>
-          <div class="sep" id="sep" hidden></div>
-          <div id="regular" role="tablist"></div>
-
-          <button class="tab newtab" id="add" title="Add tab">
-            <span class="plus">
-              <svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" /></svg>
-            </span>
-            <span class="label">New tab</span>
-          </button>
-
-          <!-- non-tab controls; DOM order is settings, toggle, back, forward, reload
-               (left to right when expanded, bottom to top when compact) -->
-          <div id="foot">
-            <button class="btn" id="settings" title="Sidebar settings">
-              <svg viewBox="0 0 16 16"><path d="M2.5 5h11M2.5 11h11" /><circle cx="6" cy="5" r="1.7" fill="var(--bg)" /><circle cx="10.5" cy="11" r="1.7" fill="var(--bg)" /></svg>
+    <div id="shell">
+      <div id="urlslot" hidden>
+        <div id="urlbar">
+          <div id="navgrp"></div>
+          <div id="field">
+            <button class="fbtn" id="copy" title="Copy link">
+              <svg class="link-icon" viewBox="0 0 16 16">
+                <path
+                  d="M6.6 9.4a2.6 2.6 0 0 0 3.7 0l2-2a2.6 2.6 0 0 0-3.7-3.7l-.6.6"
+                />
+                <path
+                  d="M9.4 6.6a2.6 2.6 0 0 0-3.7 0l-2 2a2.6 2.6 0 0 0 3.7 3.7l.6-.6"
+                />
+              </svg>
+              <svg class="ok-icon" viewBox="0 0 16 16">
+                <path d="M3.5 8.5 6.5 11.5 12.5 5" />
+              </svg>
             </button>
-            <button class="btn" id="toggle" title="Collapse sidebar">
-              <svg viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="10" rx="2" /><path d="M6 3v10" /></svg>
-            </button>
-            <button class="btn" id="back" title="Back" hidden>
-              <svg viewBox="0 0 16 16"><path d="M13 8H3M7 4 3 8l4 4" /></svg>
-            </button>
-            <button class="btn" id="forward" title="Forward" hidden>
-              <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
-            </button>
-            <button class="btn" id="reload" title="Reload / retry">
-              <svg viewBox="0 0 16 16"><path d="M12.5 8A4.5 4.5 0 1 1 11 4.7" /><path d="M12 2v3H9" /></svg>
+            <input
+              id="addr"
+              type="text"
+              placeholder="Enter address"
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </div>
+          <div id="rgrp">
+            <button class="btn" id="hist" title="Pages visited in this tab">
+              <svg viewBox="0 0 16 16">
+                <path d="M2.5 8a5.5 5.5 0 1 1 1.6 3.9" />
+                <path d="M2.5 5v3h3" />
+                <path d="M8 5.3V8l1.9 1.2" />
+              </svg>
             </button>
           </div>
-        </nav>
-      </aside>
-
-      <main id="main">
-        <div id="frames">
-          <div id="empty" hidden>No tabs yet. Press “New tab” to add one.</div>
         </div>
+      </div>
+      <div id="hotUrl" hidden></div>
+      <div id="app">
+        <aside id="slot">
+          <nav id="rail" aria-label="Tabs">
+            <div
+              id="essentials"
+              role="group"
+              aria-label="Essentials"
+              hidden
+            ></div>
+            <div class="sep" id="sepA" hidden></div>
+            <div id="pinned" role="group" aria-label="Pinned" hidden></div>
+            <div class="sep" id="sep" hidden></div>
+            <div id="regular" role="tablist"></div>
 
-        <div id="hot" hidden></div>
+            <button class="tab newtab" id="add" title="Add tab">
+              <span class="plus">
+                <svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" /></svg>
+              </span>
+              <span class="label">New tab</span>
+            </button>
 
-        <form id="form" hidden autocomplete="off">
-          <div id="formTitle"></div>
-          <input id="nameIn" placeholder="Name (optional)" maxlength="30" />
-          <input id="urlIn" placeholder="http://192.168.1.20:8096" spellcheck="false" />
-          <div class="seg" role="radiogroup" aria-label="Tab type">
-            <label class="seg-opt"><input type="radio" name="kind" value="regular" checked /><span>Regular</span></label>
-            <label class="seg-opt"><input type="radio" name="kind" value="pinned" /><span>Pinned</span></label>
-            <label class="seg-opt"><input type="radio" name="kind" value="essential" /><span>Essential</span></label>
+            <!-- non-tab controls; DOM order is settings, toggle, back, forward, reload
+               (left to right when expanded, bottom to top when compact) -->
+            <div id="foot">
+              <button class="btn" id="settings" title="Sidebar settings">
+                <svg viewBox="0 0 16 16">
+                  <path d="M2.5 5h11M2.5 11h11" />
+                  <circle cx="6" cy="5" r="1.7" fill="var(--bg)" />
+                  <circle cx="10.5" cy="11" r="1.7" fill="var(--bg)" />
+                </svg>
+              </button>
+              <button class="btn" id="toggle" title="Collapse sidebar">
+                <svg viewBox="0 0 16 16">
+                  <rect x="2" y="3" width="12" height="10" rx="2" />
+                  <path d="M6 3v10" />
+                </svg>
+              </button>
+              <button class="btn" id="back" title="Back" hidden>
+                <svg viewBox="0 0 16 16"><path d="M13 8H3M7 4 3 8l4 4" /></svg>
+              </button>
+              <button class="btn" id="forward" title="Forward" hidden>
+                <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
+              </button>
+              <button class="btn" id="reload" title="Reload / retry">
+                <svg viewBox="0 0 16 16">
+                  <path d="M12.5 8A4.5 4.5 0 1 1 11 4.7" />
+                  <path d="M12 2v3H9" />
+                </svg>
+              </button>
+            </div>
+          </nav>
+        </aside>
+
+        <main id="main">
+          <div id="frames">
+            <div id="empty" hidden>
+              No tabs yet. Press “New tab” to add one.
+            </div>
           </div>
-          <div class="row">
-            <button type="button" id="cancel">Cancel</button>
-            <button type="submit" id="save">Save</button>
-          </div>
-        </form>
 
-        <div id="toast" hidden></div>
-      </main>
+          <div id="hot" hidden></div>
+
+          <form id="form" hidden autocomplete="off">
+            <div id="formTitle"></div>
+            <input id="nameIn" placeholder="Name (optional)" maxlength="30" />
+            <input
+              id="urlIn"
+              placeholder="http://192.168.1.20:8096"
+              spellcheck="false"
+            />
+            <div class="seg" role="radiogroup" aria-label="Tab type">
+              <label class="seg-opt"
+                ><input type="radio" name="kind" value="regular" checked /><span
+                  >Regular</span
+                ></label
+              >
+              <label class="seg-opt"
+                ><input type="radio" name="kind" value="pinned" /><span
+                  >Pinned</span
+                ></label
+              >
+              <label class="seg-opt"
+                ><input type="radio" name="kind" value="essential" /><span
+                  >Essential</span
+                ></label
+              >
+            </div>
+            <div class="row">
+              <button type="button" id="cancel">Cancel</button>
+              <button type="submit" id="save">Save</button>
+            </div>
+          </form>
+
+          <div id="toast" hidden></div>
+        </main>
+      </div>
     </div>
 
     <div id="menu" role="menu" hidden></div>
+    <div id="hmenu" role="menu" hidden></div>
     <script src="sidebar.js"></script>
   </body>
 </html>

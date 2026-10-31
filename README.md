@@ -36,8 +36,8 @@ Great for:
 
 ## Screenshots
 
-| Tabs and display modes | Adding a tab | Edit  existing tab |
-|---|---|---|
+| Tabs and display modes                     | Adding a tab                                  | Edit existing tab                              |
+| ------------------------------------------ | --------------------------------------------- | ---------------------------------------------- |
 | ![Tabs](preview-pictures/screenshot-2.png) | ![Add tab](preview-pictures/screenshot-3.png) | ![Edit tab](preview-pictures/screenshot-4.png) |
 
 ## Features
@@ -64,12 +64,12 @@ To change the shortcut, open `about:addons`, click the gear icon and choose **Ma
 
 ## Permissions
 
-| Permission | Why |
-|---|---|
-| `storage` | Saves your tab names and URLs locally. |
-| `http://localhost/*`, `http://127.0.0.1/*` | Default hosts, so local dev servers work without a prompt. |
-| Optional `http://*/*`, `https://*/*` | Requested one host at a time, only when you add or edit a tab. |
-| `webRequest`, `webRequestBlocking` | Removes `X-Frame-Options` and the CSP `frame-ancestors` directive on responses from hosts you granted, only for pages shown inside this extension's sidebar, so those pages can load in the iframe. |
+| Permission                                 | Why                                                                                                                                                                                                 |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage`                                  | Saves your tab names and URLs locally.                                                                                                                                                              |
+| `http://localhost/*`, `http://127.0.0.1/*` | Default hosts, so local dev servers work without a prompt.                                                                                                                                          |
+| Optional `http://*/*`, `https://*/*`       | Requested one host at a time, only when you add or edit a tab.                                                                                                                                      |
+| `webRequest`, `webRequestBlocking`         | Removes `X-Frame-Options` and the CSP `frame-ancestors` directive on responses from hosts you granted, only for pages shown inside this extension's sidebar, so those pages can load in the iframe. |
 
 Only grant access to hosts you trust.
 

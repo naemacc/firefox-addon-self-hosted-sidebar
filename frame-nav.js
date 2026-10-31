@@ -31,6 +31,7 @@
       index,
       length,
       url: location.href,
+      title: document.title,
     };
   }
 
@@ -48,7 +49,10 @@
     const nav = window.navigation;
     if (!nav) return;
     try {
-      const r = dir === "back" ? nav.canGoBack && nav.back() : nav.canGoForward && nav.forward();
+      const r =
+        dir === "back"
+          ? nav.canGoBack && nav.back()
+          : nav.canGoForward && nav.forward();
       if (r) {
         r.committed?.catch(() => {});
         r.finished?.catch(() => {});
@@ -67,10 +71,14 @@
       report(true);
       if (!timer) {
         timer = setInterval(report, 400);
-        window.navigation?.addEventListener?.("currententrychange", () => report());
+        window.navigation?.addEventListener?.("currententrychange", () =>
+          report(),
+        );
       }
     } else if (m.ssb === "back" || m.ssb === "forward") {
       step(m.ssb);
+    } else if (m.ssb === "reload") {
+      location.reload(); // reloads in place without adding a history entry
     }
   });
 })();
