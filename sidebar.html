@@ -1,179 +1,131 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="color-scheme" content="dark" />
+    <title>Self-Hosted Sidebar</title>
     <style>
+      :root {
+        --bg: #1c1b22;
+        --surface: #2b2a33;
+        --hover: rgba(255, 255, 255, 0.08);
+        --active: #42414d;
+        --line: #3a393f;
+        --text: #fbfbfe;
+        --muted: #bfbfc9;
+        --accent: #6c8cff;
+        --radius: 10px;
+        --tab-h: 42px;
+        --tile-w: 48px;
+        --btn: 34px;
+        --icon: 18px;
+        color-scheme: dark;
+        font:
+          13px/1.3 system-ui,
+          sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
       html,
       body {
         margin: 0;
         height: 100%;
-        font: 12px sans-serif;
-        background: #1c1b22;
-        color: #fbfbfe;
-      }
-      body {
-        display: flex;
-        flex-direction: column;
-        position: relative;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--text);
       }
       [hidden] {
         display: none !important;
       }
-
-      /* ---- dark tab bar (always dark, independent of the page) ---- */
-      #bar {
-        display: flex;
-        align-items: stretch;
-        gap: 4px;
-        padding: 4px 4px 0;
-        background: #1c1b22;
-        color-scheme: dark;
-      }
-      #mode {
-        width: auto;
-        min-width: 26px;
-        padding: 0 4px;
-      }
-      #tabs {
-        display: flex;
-        flex: 1;
-        min-width: 0;
-        gap: 2px;
-        overflow-x: auto;
-        scrollbar-width: none;
-      }
-      .tab img {
-        width: 14px;
-        height: 14px;
-        flex: 0 0 auto;
-        border-radius: 3px;
-      }
-      .tab {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        flex: 0 0 auto;
-        max-width: 140px;
-        padding: 5px 6px 5px 10px;
-        border-radius: 6px 6px 0 0;
-        border-bottom: 2px solid transparent;
-        background: #2b2a33;
-        color: #bfbfc9;
-        cursor: pointer;
-        user-select: none;
-        white-space: nowrap;
-      }
-      .tab span {
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .tab:hover {
-        background: #38373f;
-        color: #fff;
-      }
-      .tab.active {
-        background: #42414d;
-        color: #fff;
-        border-bottom-color: #6c8cff;
-      }
-      .tab.dragging {
-        opacity: 0.4;
-      }
-      .tab.drop-before {
-        box-shadow: inset 2px 0 0 #6c8cff;
-      }
-      .tab.drop-after {
-        box-shadow: inset -2px 0 0 #6c8cff;
-      }
-      .tab .x {
-        all: unset;
-        flex: 0 0 auto;
-        display: grid;
-        place-items: center;
-        width: 16px;
-        height: 16px;
-        border-radius: 4px;
-        line-height: 1;
-        color: inherit;
-        opacity: 0.6;
-        cursor: pointer;
-      }
-      .tab .x:hover {
-        opacity: 1;
-        background: #5b5a66;
-      }
-      .ctl {
-        all: unset;
-        flex: 0 0 auto;
-        display: grid;
-        place-items: center;
-        width: 26px;
-        margin-bottom: 2px;
-        border-radius: 6px;
-        background: #2b2a33;
-        color: #bfbfc9;
-        cursor: pointer;
-      }
-      .ctl:hover {
-        background: #42414d;
-        color: #fff;
+      button {
+        font: inherit;
       }
 
-      /* ---- add / edit panel ---- */
-      #form {
+      /* ---------- layout: [rail slot][page] (mirrored when placement=right) ---------- */
+      #shell {
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        padding: 8px;
-        background: #25242b;
-        border-top: 1px solid #42414d;
-        color-scheme: dark;
-      }
-      #formTitle {
-        font-weight: bold;
-      }
-      #form input {
-        padding: 5px 6px;
-        border: 1px solid #52525e;
-        border-radius: 4px;
-        background: #1c1b22;
-        color: #fbfbfe;
-        font: inherit;
-      }
-      #form input:focus {
-        outline: none;
-        border-color: #6c8cff;
-      }
-      #form .row {
-        display: flex;
-        justify-content: flex-end;
-        gap: 6px;
-      }
-      #form button {
-        padding: 4px 12px;
-        border: 1px solid #52525e;
-        border-radius: 4px;
-        background: #2b2a33;
-        color: #fbfbfe;
-        font: inherit;
-        cursor: pointer;
-      }
-      #form button:hover {
-        background: #42414d;
-      }
-      #form button[type="submit"] {
-        background: #3b6bff;
-        border-color: #3b6bff;
-      }
-      #form button[type="submit"]:hover {
-        background: #5a82ff;
-      }
-
-      /* ---- page area ---- */
-      #frames {
-        flex: 1;
+        height: 100%;
         position: relative;
-        border-top: 1px solid #42414d;
+      }
+      #app {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+        position: relative;
+      }
+      #app[data-layout="vertical"][data-placement="right"] {
+        flex-direction: row-reverse;
+      }
+      #app[data-layout="horizontal"] {
+        flex-direction: column;
+      }
+      #slot {
+        position: relative;
+        z-index: 20;
+        flex: 0 0 var(--slot-size, 150px);
+        width: var(--slot-size, 150px);
+        transition:
+          flex-basis 0.1s ease,
+          width 0.1s ease,
+          height 0.1s ease;
+      }
+      #app[data-layout="horizontal"] #slot {
+        width: auto;
+        height: var(--slot-size, 40px);
+      }
+      #rail {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: var(--rail-size, 150px);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 6px;
+        overflow: hidden;
+        background: var(--bg);
+        clip-path: inset(-24px);
+        transition:
+          width 0.1s ease,
+          height 0.1s ease,
+          clip-path 0.1s ease;
+      }
+      #app[data-layout="vertical"][data-placement="left"] #rail {
+        left: 0;
+      }
+      #app[data-layout="vertical"][data-placement="right"] #rail {
+        right: 0;
+      }
+      /* auto-hide: the bar collapses to nothing and the slot keeps a thin hover edge */
+      #rail.hiddenbar {
+        pointer-events: none;
+      }
+      #app[data-layout="vertical"][data-placement="left"] #rail.hiddenbar {
+        clip-path: inset(-24px 100% -24px -24px);
+      }
+      #app[data-layout="vertical"][data-placement="right"] #rail.hiddenbar {
+        clip-path: inset(-24px -24px -24px 100%);
+      }
+      #app[data-layout="horizontal"] #rail.hiddenbar {
+        clip-path: inset(-24px -24px 100% -24px);
+      }
+      #slot.floating #rail {
+        box-shadow: 0 0 18px rgba(0, 0, 0, 0.55);
+      }
+      #main {
+        flex: 1;
+        min-width: 0;
+        position: relative;
+        padding: 4px;
+      }
+      #frames {
+        position: absolute;
+        inset: 4px;
+        border-radius: var(--radius);
+        overflow: hidden;
+        background: #fff;
       }
       #frames iframe {
         position: absolute;
@@ -187,53 +139,958 @@
         display: none;
       }
       #empty {
-        padding: 24px 12px;
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-content: center;
+        padding: 16px;
         text-align: center;
+        background: var(--bg);
         color: #8f8f9d;
       }
 
+      /* ---------- toolbar: collapse + back / forward / reload ---------- */
+      .btn {
+        appearance: none;
+        flex: none;
+        display: grid;
+        place-items: center;
+        width: var(--tile-w);
+        height: var(--tab-h);
+        padding: 0;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: var(--hover);
+        color: var(--text);
+      }
+      .btn:focus-visible,
+      .tab:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: -2px;
+      }
+      .btn svg {
+        width: var(--icon);
+        height: var(--icon);
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      /* ---------- tab groups ---------- */
+      #essentials {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(var(--tile-w), 1fr));
+        gap: 4px;
+        flex: none;
+      }
+      #pinned {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        flex: none;
+      }
+      #regular {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        flex: 0 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        scrollbar-width: thin;
+      }
+      .sep {
+        flex: none;
+        height: 1px;
+        margin: 4px 6px;
+        background: var(--line);
+      }
+
+      /* ---------- a tab ---------- */
+      .tab {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: none;
+        height: var(--tab-h);
+        padding: 0 8px 0 calc((var(--tile-w) - var(--icon)) / 2);
+        border-radius: var(--radius);
+        color: var(--muted);
+        cursor: default;
+        user-select: none;
+        outline: none;
+      }
+      .tab:hover {
+        background: var(--hover);
+        color: var(--text);
+      }
+      .tab.active {
+        background: var(--active);
+        color: var(--text);
+      }
+      .tab.dragging {
+        opacity: 0.4;
+      }
+      .tab.drop-before {
+        box-shadow: inset 0 2px 0 var(--accent);
+      }
+      .tab.drop-after {
+        box-shadow: inset 0 -2px 0 var(--accent);
+      }
+      .tab.essential.drop-before {
+        box-shadow: inset 2px 0 0 var(--accent);
+      }
+      .tab.essential.drop-after {
+        box-shadow: inset -2px 0 0 var(--accent);
+      }
+      .icon {
+        flex: none;
+        display: grid;
+        place-items: center;
+        width: var(--icon);
+        height: var(--icon);
+      }
+      .icon .fav {
+        width: var(--icon);
+        height: var(--icon);
+        border-radius: 4px;
+      }
+      .icon .ltr {
+        display: none;
+        place-items: center;
+        width: var(--icon);
+        height: var(--icon);
+        border-radius: 5px;
+        background: var(--surface);
+        color: var(--text);
+        font-size: calc(var(--icon) * 0.55);
+        font-weight: 600;
+      }
+      .tab:not(.hasimg) .fav {
+        display: none;
+      }
+      .tab:not(.hasimg) .ltr {
+        display: grid;
+      }
+      .label {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* close button: regular tabs only, and only while hovering that tab */
+      .tab .x {
+        appearance: none;
+        position: absolute;
+        right: 6px;
+        top: 0;
+        bottom: 0;
+        margin: auto 0;
+        display: none;
+        flex: none;
+        place-items: center;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        border: 0;
+        border-radius: 5px;
+        background: transparent;
+        color: inherit;
+        font-size: 16px;
+        line-height: 1;
+        cursor: pointer;
+      }
+      .tab.regular:hover .x,
+      .tab.regular:focus-visible .x {
+        display: grid;
+      }
+      .tab .x:hover {
+        background: rgba(255, 255, 255, 0.16);
+      }
+      .tab .x svg {
+        width: 12px;
+        height: 12px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.7;
+        stroke-linecap: round;
+      }
+      #rail.collapsed .tab.regular .x svg,
+      #app[data-display="icon"] .tab.regular .x svg {
+        width: calc(var(--badge) * 0.62);
+        height: calc(var(--badge) * 0.62);
+      }
+      /* the label fades out beneath the X instead of being squeezed by it */
+      .tab.regular:hover .label {
+        -webkit-mask-image: linear-gradient(
+          to right,
+          #000 calc(100% - 34px),
+          transparent calc(100% - 20px)
+        );
+        mask-image: linear-gradient(
+          to right,
+          #000 calc(100% - 34px),
+          transparent calc(100% - 20px)
+        );
+      }
+      /* icon-only and compact tabs: round close badge at the icon's corner (Zen style) */
+      #rail.collapsed .tab.regular:hover .x,
+      #app[data-display="icon"] .tab.regular:hover .x {
+        display: grid;
+        left: 1px;
+        right: auto;
+        top: 1px;
+        bottom: auto;
+        margin: 0;
+        width: var(--badge);
+        height: var(--badge);
+        border: 1px solid #5b5a66;
+        border-radius: 50%;
+        background: var(--surface);
+        font-size: calc(var(--badge) * 0.8);
+      }
+      #rail.collapsed .tab.regular .x:hover,
+      #app[data-display="icon"] .tab.regular .x:hover {
+        background: #5b5a66;
+      }
+
+      /* essentials: square tiles, icon only */
+      .tab.essential {
+        height: calc(var(--tab-h) + 6px);
+        justify-content: center;
+        padding: 0;
+        background: var(--surface);
+      }
+      .tab.essential:hover {
+        background: var(--active);
+      }
+      .tab.essential.active {
+        background: color-mix(
+          in srgb,
+          var(--tab-color, var(--accent)) 24%,
+          var(--surface)
+        );
+        box-shadow: inset 0 0 0 1.5px var(--tab-color, var(--accent));
+      }
+      #rail.collapsed .tab.essential {
+        height: var(--tab-h);
+      }
+      .tab.essential .label {
+        display: none;
+      }
+
+      /* tab display modes */
+      #app[data-display="icon"] .label {
+        display: none;
+      }
+      #app[data-display="icon"][data-layout="horizontal"] #regular .tab {
+        justify-content: center;
+        padding: 0;
+        min-width: var(--tab-h);
+      }
+      #app[data-display="name"] .fav {
+        display: none !important;
+      }
+      #app[data-display="name"] .ltr {
+        display: grid !important;
+      }
+      #app[data-display="name"]
+        #rail:not(.collapsed)
+        .tab:not(.essential)
+        .icon {
+        display: none;
+      }
+
+      /* collapsed (compact) rail */
+      #rail.collapsed .label {
+        display: none !important;
+      }
+      #rail.collapsed .tab {
+        justify-content: center;
+        padding: 0;
+      }
+      #rail.collapsed #essentials {
+        grid-template-columns: 1fr;
+      }
+      #rail.collapsed .newtab .label {
+        display: none;
+      }
+
+      /* new tab row + footer */
+      #add {
+        appearance: none;
+        width: 100%;
+        border: 0;
+        background: transparent;
+        text-align: left;
+      }
+      #add .plus {
+        flex: none;
+        display: grid;
+        place-items: center;
+        width: var(--icon);
+        height: var(--icon);
+      }
+      #add .plus svg {
+        width: var(--icon);
+        height: var(--icon);
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+      }
+
+      #rail {
+        --badge: max(14px, calc(var(--icon) * 0.7));
+        font-size: var(--fs, 13px);
+      }
+      /* invisible hover zone laid over the page edge while the bar is auto-hidden */
+      #hot {
+        position: absolute;
+        z-index: 15;
+        background: transparent;
+      }
+      #app[data-layout="vertical"][data-placement="left"] #hot {
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 14px;
+      }
+      #app[data-layout="vertical"][data-placement="right"] #hot {
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 14px;
+      }
+      #app[data-layout="horizontal"] #hot {
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 12px;
+      }
+
+      /* ---------- horizontal layout (classic tab strip) ---------- */
+      #app[data-layout="horizontal"] #rail {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: auto;
+        width: auto;
+        height: var(--rail-size, 40px);
+        flex-direction: row;
+        align-items: center;
+        padding: 4px 6px;
+      }
+      #app[data-layout="horizontal"] #essentials {
+        display: flex;
+        gap: 2px;
+      }
+      #app[data-layout="horizontal"] #pinned {
+        flex-direction: row;
+      }
+      #app[data-layout="horizontal"] #regular {
+        flex-direction: row;
+        flex: 0 1 auto;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+      }
+      #app[data-layout="horizontal"] .sep {
+        width: 1px;
+        height: 18px;
+        margin: 0 4px;
+      }
+      #app[data-layout="horizontal"] #regular .tab {
+        min-width: calc(var(--tab-h) + 8px);
+      }
+      #app[data-layout="horizontal"] #regular .tab {
+        max-width: 150px;
+      }
+      #app[data-layout="horizontal"] .tab.essential {
+        height: var(--tab-h);
+        width: var(--tab-h);
+      }
+      #app[data-layout="horizontal"] .tab.pinned {
+        justify-content: center;
+        min-width: var(--tab-h);
+        padding: 0;
+      }
+      #app[data-layout="horizontal"] .tab.pinned .label {
+        display: none;
+      }
+      #app[data-display="name"][data-layout="horizontal"]
+        #rail
+        .tab.pinned
+        .icon {
+        display: grid !important;
+      }
+      #app[data-layout="horizontal"] .tab.drop-before,
+      #app[data-layout="horizontal"] .tab.essential.drop-before {
+        box-shadow: inset 2px 0 0 var(--accent);
+      }
+      #app[data-layout="horizontal"] .tab.drop-after,
+      #app[data-layout="horizontal"] .tab.essential.drop-after {
+        box-shadow: inset -2px 0 0 var(--accent);
+      }
+      #app[data-layout="horizontal"] #add {
+        width: var(--tab-h);
+        min-width: var(--tab-h);
+        padding: 0;
+        justify-content: center;
+      }
+      #app[data-layout="horizontal"] #add .label {
+        display: none;
+      }
+
+      /* ---------- footer: settings, collapse toggle, back, forward, reload ---------- */
+      #foot {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        margin-top: auto;
+        padding-top: 4px;
+        flex: none;
+      }
+      #foot .btn {
+        width: var(--btn);
+        height: var(--btn);
+      }
+      #foot .btn:first-child {
+        width: var(--tile-w); /* settings sits on the shared icon axis */
+      }
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      #rail.collapsed #foot {
+        flex-direction: column-reverse; /* bottom to top: settings, toggle, back, forward, reload */
+        align-items: stretch;
+      }
+      #rail.collapsed #foot .btn {
+        width: var(--tile-w);
+        height: var(--tab-h);
+      }
+      #app[data-layout="horizontal"] #foot {
+        margin: 0 0 0 auto;
+        padding: 0;
+      }
+      #app[data-layout="horizontal"] #foot .btn {
+        width: var(--btn);
+        height: var(--btn);
+      }
+
+      /* a short, clear divider between Essentials, Pinned and regular tabs when the bar is compact */
+      #rail.collapsed .sep {
+        width: calc(var(--icon) + 6px);
+        height: 1px;
+        margin: 6px auto;
+        background: #4b4a55;
+      }
+
+      /* Essentials box: "active" = only the selected essential has a box, "off" = ring only */
+      #app[data-essbox="active"] .tab.essential:not(.active),
+      #app[data-essbox="off"] .tab.essential {
+        background: transparent;
+      }
+      #app[data-essbox="active"] .tab.essential:not(.active):hover,
+      #app[data-essbox="off"] .tab.essential:hover {
+        background: var(--hover);
+      }
+      #app[data-essbox="off"] .tab.essential.active {
+        background: transparent;
+      }
+
+      /* ---------- address bar ---------- */
+      #urlslot {
+        position: relative;
+        z-index: 25;
+        flex: 0 0 var(--url-slot, 0px);
+        height: var(--url-slot, 0px);
+        transition:
+          flex-basis 0.1s ease,
+          height 0.1s ease;
+      }
+      #urlbar {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: var(--url-top, 0px);
+        height: var(--url-size, 0px);
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 0 6px;
+        overflow: hidden;
+        background: var(--bg);
+        font-size: var(--fs, 13px);
+        transition: height 0.1s ease;
+      }
+      #urlbar.hiddenbar {
+        pointer-events: none;
+      }
+      #urlslot.floating #urlbar {
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      }
+      #navgrp,
+      #rgrp {
+        display: flex;
+        align-items: center;
+        flex: none;
+        transition: min-width 0.1s ease;
+      }
+      #navgrp .btn,
+      #rgrp .btn {
+        width: calc(var(--btn) - 4px);
+        height: var(--btn);
+      }
+      /* only Reload showing: it sits on the same axis as the tab icons below it */
+      #urlbar.single #reload {
+        width: var(--tile-w);
+      }
+      /* vertical tabs: the group beside the tab bar is as wide as the tab bar, so the address
+         field starts at the page edge and a lone button sits above the tab icons */
+      #shell[data-layout="vertical"][data-placement="left"] #navgrp {
+        min-width: calc(var(--slot-size) - 2px);
+      }
+      #shell[data-layout="vertical"][data-placement="right"] #rgrp {
+        min-width: calc(var(--slot-size) - 2px);
+        justify-content: flex-end;
+      }
+      #shell[data-layout="vertical"][data-placement="right"] #rgrp .btn {
+        width: var(--tile-w);
+      }
+      #shell[data-placement="left"] #field {
+        margin-right: 2px;
+      }
+      #shell[data-placement="right"] #field {
+        margin-left: 2px;
+      }
+      #shell[data-layout="horizontal"] #field {
+        margin: 0 2px;
+      }
+      #hotUrl {
+        position: absolute;
+        z-index: 26;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 12px;
+      }
+      #field {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        height: var(--btn);
+        border-radius: 10px;
+        background: var(--surface);
+      }
+      #field:focus-within {
+        box-shadow: 0 0 0 2px var(--accent);
+      }
+      #addr {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        padding: 0 4px;
+        border: 0;
+        outline: none;
+        background: transparent;
+        color: var(--text);
+        font: inherit;
+        text-overflow: ellipsis;
+      }
+      #addr::placeholder {
+        color: var(--muted);
+      }
+      .fbtn {
+        appearance: none;
+        flex: none;
+        display: grid;
+        place-items: center;
+        width: var(--btn);
+        height: 100%;
+        padding: 0;
+        border: 0;
+        border-radius: 10px;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .fbtn:hover {
+        background: var(--hover);
+        color: var(--text);
+      }
+      .fbtn:disabled {
+        opacity: 0.4;
+        cursor: default;
+      }
+      .fbtn svg {
+        width: calc(var(--icon) - 2px);
+        height: calc(var(--icon) - 2px);
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      #copy .ok-icon {
+        display: none;
+        color: #6fd08c;
+      }
+      #copy.ok .link-icon {
+        display: none;
+      }
+      #copy.ok .ok-icon {
+        display: block;
+      }
+
+      /* history dropdown */
+      #hmenu {
+        position: fixed;
+        z-index: 60;
+        padding: 4px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+        max-height: min(60vh, 360px);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        font-size: 12px;
+      }
+      #hmenu .hitem {
+        appearance: none;
+        display: block;
+        width: 100%;
+        padding: 6px 10px;
+        border: 0;
+        border-radius: 6px;
+        background: none;
+        color: var(--text);
+        text-align: left;
+        font: inherit;
+        cursor: pointer;
+      }
+      #hmenu .hitem:hover,
+      #hmenu .hitem:focus-visible {
+        background: var(--active);
+        outline: none;
+      }
+      #hmenu .hitem.cur .t {
+        color: var(--accent);
+      }
+      #hmenu .t,
+      #hmenu .u {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #hmenu .u {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      #hmenu .empty {
+        padding: 8px 10px;
+        color: var(--muted);
+      }
+      #hmenu hr {
+        margin: 4px 2px;
+        border: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      /* ---------- add / edit popover ---------- */
+      #form {
+        position: absolute;
+        z-index: 30;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+      }
+      #formTitle {
+        font-weight: 600;
+      }
+      #form input[type="text"],
+      #form input:not([type]) {
+        padding: 6px 8px;
+        border: 1px solid #52525e;
+        border-radius: 6px;
+        background: var(--bg);
+        color: var(--text);
+        font: inherit;
+      }
+      #form input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .seg {
+        display: flex;
+        gap: 2px;
+        padding: 2px;
+        border-radius: 8px;
+        background: var(--bg);
+      }
+      .seg-opt {
+        position: relative;
+        flex: 1;
+      }
+      .seg-opt input {
+        position: absolute;
+        opacity: 0;
+      }
+      .seg-opt span {
+        display: block;
+        padding: 4px 6px;
+        border-radius: 6px;
+        text-align: center;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .seg-opt input:checked + span {
+        background: var(--active);
+        color: var(--text);
+      }
+      .seg-opt input:focus-visible + span {
+        outline: 2px solid var(--accent);
+      }
+      #form .row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 6px;
+      }
+      #form .row button {
+        padding: 5px 14px;
+        border: 1px solid #52525e;
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--text);
+        cursor: pointer;
+      }
+      #form .row button:hover {
+        background: var(--active);
+      }
+      #form .row button[type="submit"] {
+        border-color: #3b6bff;
+        background: #3b6bff;
+      }
+      #form .row button[type="submit"]:hover {
+        background: #5a82ff;
+      }
+
+      /* ---------- context menu + toast ---------- */
+      #menu {
+        position: fixed;
+        z-index: 50;
+        min-width: 160px;
+        padding: 4px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--surface);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+      }
+      #menu button {
+        appearance: none;
+        display: block;
+        width: 100%;
+        padding: 6px 10px;
+        border: 0;
+        border-radius: 5px;
+        background: none;
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+      }
+      #menu button:hover,
+      #menu button:focus-visible {
+        background: var(--active);
+        outline: none;
+      }
+      #menu hr {
+        margin: 4px 2px;
+        border: 0;
+        border-top: 1px solid var(--line);
+      }
       #toast {
         position: absolute;
-        left: 8px;
-        right: 8px;
-        bottom: 8px;
+        z-index: 40;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
         padding: 8px 10px;
-        border-radius: 6px;
-        background: #42414d;
-        color: #fbfbfe;
+        border-radius: 8px;
+        background: var(--active);
+        color: var(--text);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
         cursor: pointer;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #slot,
+        #rail {
+          transition: none;
+        }
       }
     </style>
   </head>
   <body>
-    <div id="bar">
-      <div id="tabs" role="tablist"></div>
-      <button class="ctl" id="add" title="Add tab">+</button>
-      <button class="ctl" id="mode" title="Toggle mode">&#128295;</button>
-      <button class="ctl" id="reload" title="Reload current tab">
-        &#8635;
-      </button>
-    </div>
-
-    <form id="form" hidden autocomplete="off">
-      <div id="formTitle"></div>
-      <input id="nameIn" placeholder="Name (optional)" maxlength="30" />
-      <input
-        id="urlIn"
-        placeholder="http://192.168.1.20:8096"
-        spellcheck="false"
-      />
-      <div class="row">
-        <button type="button" id="cancel">Cancel</button>
-        <button type="submit" id="save">Save</button>
+    <div id="shell">
+      <div id="urlslot" hidden>
+        <div id="urlbar">
+          <div id="navgrp"></div>
+          <div id="field">
+            <button class="fbtn" id="copy" title="Copy link">
+              <svg class="link-icon" viewBox="0 0 16 16">
+                <path
+                  d="M6.6 9.4a2.6 2.6 0 0 0 3.7 0l2-2a2.6 2.6 0 0 0-3.7-3.7l-.6.6"
+                />
+                <path
+                  d="M9.4 6.6a2.6 2.6 0 0 0-3.7 0l-2 2a2.6 2.6 0 0 0 3.7 3.7l.6-.6"
+                />
+              </svg>
+              <svg class="ok-icon" viewBox="0 0 16 16">
+                <path d="M3.5 8.5 6.5 11.5 12.5 5" />
+              </svg>
+            </button>
+            <input
+              id="addr"
+              type="text"
+              placeholder="Enter address"
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </div>
+          <div id="rgrp">
+            <button class="btn" id="hist" title="Pages visited in this tab">
+              <svg viewBox="0 0 16 16">
+                <path d="M2.5 8a5.5 5.5 0 1 1 1.6 3.9" />
+                <path d="M2.5 5v3h3" />
+                <path d="M8 5.3V8l1.9 1.2" />
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
-    </form>
+      <div id="hotUrl" hidden></div>
+      <div id="app">
+        <aside id="slot">
+          <nav id="rail" aria-label="Tabs">
+            <div
+              id="essentials"
+              role="group"
+              aria-label="Essentials"
+              hidden
+            ></div>
+            <div class="sep" id="sepA" hidden></div>
+            <div id="pinned" role="group" aria-label="Pinned" hidden></div>
+            <div class="sep" id="sep" hidden></div>
+            <div id="regular" role="tablist"></div>
 
-    <div id="frames">
-      <div id="empty" hidden>No tabs yet. Press + to add one.</div>
+            <button class="tab newtab" id="add" title="Add tab">
+              <span class="plus">
+                <svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" /></svg>
+              </span>
+              <span class="label">New tab</span>
+            </button>
+
+            <!-- non-tab controls; DOM order is settings, toggle, back, forward, reload
+               (left to right when expanded, bottom to top when compact) -->
+            <div id="foot">
+              <button class="btn" id="settings" title="Sidebar settings">
+                <svg viewBox="0 0 16 16">
+                  <path d="M2.5 5h11M2.5 11h11" />
+                  <circle cx="6" cy="5" r="1.7" fill="var(--bg)" />
+                  <circle cx="10.5" cy="11" r="1.7" fill="var(--bg)" />
+                </svg>
+              </button>
+              <button class="btn" id="toggle" title="Collapse sidebar">
+                <svg viewBox="0 0 16 16">
+                  <rect x="2" y="3" width="12" height="10" rx="2" />
+                  <path d="M6 3v10" />
+                </svg>
+              </button>
+              <button class="btn" id="back" title="Back" hidden>
+                <svg viewBox="0 0 16 16"><path d="M13 8H3M7 4 3 8l4 4" /></svg>
+              </button>
+              <button class="btn" id="forward" title="Forward" hidden>
+                <svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4" /></svg>
+              </button>
+              <button class="btn" id="reload" title="Reload / retry">
+                <svg viewBox="0 0 16 16">
+                  <path d="M12.5 8A4.5 4.5 0 1 1 11 4.7" />
+                  <path d="M12 2v3H9" />
+                </svg>
+              </button>
+            </div>
+          </nav>
+        </aside>
+
+        <main id="main">
+          <div id="frames">
+            <div id="empty" hidden>
+              No tabs yet. Press “New tab” to add one.
+            </div>
+          </div>
+
+          <div id="hot" hidden></div>
+
+          <form id="form" hidden autocomplete="off">
+            <div id="formTitle"></div>
+            <input id="nameIn" placeholder="Name (optional)" maxlength="30" />
+            <input
+              id="urlIn"
+              placeholder="http://192.168.1.20:8096"
+              spellcheck="false"
+            />
+            <div class="seg" role="radiogroup" aria-label="Tab type">
+              <label class="seg-opt"
+                ><input type="radio" name="kind" value="regular" checked /><span
+                  >Regular</span
+                ></label
+              >
+              <label class="seg-opt"
+                ><input type="radio" name="kind" value="pinned" /><span
+                  >Pinned</span
+                ></label
+              >
+              <label class="seg-opt"
+                ><input type="radio" name="kind" value="essential" /><span
+                  >Essential</span
+                ></label
+              >
+            </div>
+            <div class="row">
+              <button type="button" id="cancel">Cancel</button>
+              <button type="submit" id="save">Save</button>
+            </div>
+          </form>
+
+          <div id="toast" hidden></div>
+        </main>
+      </div>
     </div>
-    <div id="toast" hidden></div>
+
+    <div id="menu" role="menu" hidden></div>
+    <div id="hmenu" role="menu" hidden></div>
     <script src="sidebar.js"></script>
   </body>
 </html>
