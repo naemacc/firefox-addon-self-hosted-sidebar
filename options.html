@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Self-Hosted Sidebar settings</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font: 13px/1.45 system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 16px 20px 24px;
+        max-width: 560px;
+      }
+      h1 {
+        margin: 0 0 4px;
+        font-size: 17px;
+        font-weight: 600;
+      }
+      h2 {
+        margin: 22px 0 6px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+        font-size: 13px;
+        font-weight: 600;
+      }
+      fieldset {
+        margin: 0 0 14px;
+        padding: 0;
+        border: 0;
+      }
+      fieldset:disabled,
+      label:has(input:disabled) {
+        opacity: 0.45;
+      }
+      legend {
+        margin-bottom: 4px;
+        padding: 0;
+        font-weight: 500;
+      }
+      .hint {
+        margin: 0 0 6px 24px;
+        opacity: 0.7;
+      }
+      fieldset > .hint {
+        margin-left: 0;
+      }
+      label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 3px 0;
+      }
+      input {
+        accent-color: #6c8cff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sidebar settings</h1>
+
+    <form id="f">
+      <h2>Layout</h2>
+      <fieldset>
+        <legend>Tab layout</legend>
+        <label><input type="radio" name="layout" value="vertical" /> Vertical tabs</label>
+        <label><input type="radio" name="layout" value="horizontal" /> Horizontal tabs (classic strip)</label>
+      </fieldset>
+
+      <fieldset id="fsPlacement">
+        <legend>Tab bar side (vertical tabs)</legend>
+        <p class="hint">
+          Which side of the sidebar panel the tab bar sits on. Firefox decides which
+          side of the window the whole sidebar is on; extensions cannot change that,
+          so use Firefox's own sidebar settings for it.
+        </p>
+        <label><input type="radio" name="placement" value="left" /> Left</label>
+        <label><input type="radio" name="placement" value="right" /> Right</label>
+      </fieldset>
+
+      <h2>Tab bar behavior</h2>
+      <label><input type="checkbox" name="compact" /> Compact mode</label>
+      <p class="hint">Shrink the tab bar to a thin strip of icons. Vertical tabs only.</p>
+
+      <label><input type="checkbox" name="expand" /> Expand on hover</label>
+      <p class="hint">While compact, show full tab names when you hover the strip.</p>
+
+      <label><input type="checkbox" name="autohide" /> Auto-hide</label>
+      <p class="hint">
+        Hide the tab bar completely until you hover the edge of the sidebar. Works
+        on its own or together with compact mode.
+      </p>
+
+      <fieldset id="fsHover">
+        <legend>Hover style</legend>
+        <p class="hint">How the bar appears when it expands or reveals itself.</p>
+        <label><input type="radio" name="hover" value="overlay" /> Float over the page</label>
+        <label><input type="radio" name="hover" value="push" /> Push the page aside</label>
+      </fieldset>
+
+      <h2>Toolbar buttons</h2>
+      <p class="hint" style="margin-left: 0">
+        These sit at the bottom of the tab bar (bottom to top when compact, left to right
+        when expanded). Settings and Reload are always shown.
+      </p>
+      <label><input type="checkbox" name="showToggle" /> Collapse / expand button</label>
+      <label><input type="checkbox" name="showBack" /> Back button</label>
+      <label><input type="checkbox" name="showForward" /> Forward button</label>
+      <p class="hint">Back and Forward only appear when there is a page to go back or forward to.</p>
+
+      <h2>Tab appearance</h2>
+      <fieldset>
+        <legend>Tab display</legend>
+        <label><input type="radio" name="display" value="both" /> Favicon + name</label>
+        <label><input type="radio" name="display" value="icon" /> Favicon only</label>
+        <label><input type="radio" name="display" value="name" /> Name only</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Tab size</legend>
+        <p class="hint">Scales favicons, buttons, tab height and text, in both layouts. Medium matches Zen's own sidebar.</p>
+        <label><input type="radio" name="size" value="small" /> Small</label>
+        <label><input type="radio" name="size" value="medium" /> Medium</label>
+        <label><input type="radio" name="size" value="large" /> Large</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Essentials background box</legend>
+        <label><input type="radio" name="essBox" value="all" /> On every Essential</label>
+        <label><input type="radio" name="essBox" value="active" /> Only on the selected Essential</label>
+        <label><input type="radio" name="essBox" value="off" /> Off (just an outline on the selected one)</label>
+      </fieldset>
+    </form>
+
+    <script src="options.js"></script>
+  </body>
+</html>
